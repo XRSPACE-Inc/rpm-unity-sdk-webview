@@ -1,21 +1,26 @@
 #if UNITY_IOS
 using System.IO;
 using UnityEditor;
-using UnityEngine;
 using UnityEditor.Callbacks;
+using UnityEditor.iOS.Xcode;
 
 namespace ReadyPlayerMe.WebView.Editor
 {
     public class IOSBuildProcessor
     {
-        [PostProcessBuildAttribute(100)]
+        [PostProcessBuild(100)]
         public static void OnPostprocessBuild(BuildTarget target, string pathToBuiltProject)
         {
             if (BuildTarget.iOS != target) return;
             var projectPath = $"{pathToBuiltProject}/Unity-iPhone.xcodeproj/project.pbxproj";
             PBXProject proj = new PBXProject();
             proj.ReadFromString(File.ReadAllText(projectPath));
-            proj.AddFrameworkToProject(proj.TargetGuidByName("Unity-iPhone"), "WebKit.framework", false);
+#if UNITY_2019_3_OR_NEWER
+            string targetGuid = proj.GetUnityMainTargetGuid();
+#else
+            string targetGuid = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
+#endif
+            proj.AddFrameworkToProject(targetGuid, "WebKit.framework", false);
             File.WriteAllText(projectPath, proj.WriteToString());
         }
     }
