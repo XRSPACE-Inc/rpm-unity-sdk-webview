@@ -16,9 +16,9 @@ namespace ReadyPlayerMe.WebView.Editor
             PBXProject proj = new PBXProject();
             proj.ReadFromString(File.ReadAllText(projectPath));
 #if UNITY_2019_3_OR_NEWER
-            string targetGuid = proj.GetUnityMainTargetGuid();
+            string targetGuid = proj.GetUnityFrameworkTargetGuid();
 #else
-            string targetGuid = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
+            string targetGuid = proj.TargetGuidByName("Unity-iPhone");
 #endif
             proj.AddFrameworkToProject(targetGuid, "WebKit.framework", false);
             File.WriteAllText(projectPath, proj.WriteToString());
